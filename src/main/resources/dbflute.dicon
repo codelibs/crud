@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR2.1//DTD S2Container//EN"
+    "http://www.seasar.org/dtd/components21.dtd">
+
+<components namespace="dbflute">
+    <include path="j2ee.dicon"/>
+
+    <!-- The components of DBFlute Runtime. -->
+    <component name="introduction" class="org.codelibs.crud.db.allcommon.DBFluteInitializer"/>
+    <component name="invokerAssistant" class="org.codelibs.crud.db.allcommon.ImplementedInvokerAssistant"/>
+    <component name="commonColumnAutoSetupper" class="org.codelibs.crud.db.allcommon.ImplementedCommonColumnAutoSetupper"/>
+    <component name="behaviorSelector" class="org.codelibs.crud.db.allcommon.ImplementedBehaviorSelector"/>
+    <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker"/>
+
+    <!-- The components of Behavior. -->
+    <component name="crudTableBhv" class="org.codelibs.crud.db.exbhv.CrudTableBhv"/>
+</components>

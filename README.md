@@ -1,4 +1,4 @@
-crud
+CRUD Web Application for DBFlute Maven Plugin
 ====
 
-CRUD Web Application for DBFlute template
+This project is CRUD Web Application to generate template files for DBFlute Maven Plugin.

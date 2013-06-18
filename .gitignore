@@ -1,1 +1,7 @@
 target/
+work/
+dbflute_crud/
+mydbflute/
+.settings/
+.project
+.classpath
