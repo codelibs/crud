@@ -364,13 +364,17 @@ public class BsCrudTableAction implements Serializable {
         } else {
             crudTable = new CrudTable();
         }
+        updateCrudTable(crudTable);
+
+        return crudTable;
+    }
+
+    protected void updateCrudTable(CrudTable crudTable) {
         Beans.copy(crudTableForm, crudTable).excludes("searchParams", "mode")
     /* CRUD: BEGIN
             #if(${table.converterToEntity})${table.converterToEntity}#end##
        CRUD: END */
                 .execute();
-
-        return crudTable;
     }
 
     protected Map<String, String> createKeyMap() {
