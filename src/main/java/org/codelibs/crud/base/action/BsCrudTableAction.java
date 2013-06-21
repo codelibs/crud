@@ -47,7 +47,14 @@ public class BsCrudTableAction implements Serializable {
 
     protected String displayList(boolean redirect) {
         // page navi
-        crudTableItems = crudTableService.getCrudTableList(crudTablePager);
+        try {
+            crudTableItems = crudTableService.getCrudTableList(crudTablePager);
+        } catch (Exception e) {
+            crudTablePager.clear();
+            log.warn("Could not retrieve the data", e);
+            throw new ActionMessagesException(
+                    "errors.crud_failed_to_retrieve_crud_table");
+        }
 
         // restore from pager
         Beans.copy(crudTablePager, crudTableForm.searchParams)
@@ -64,12 +71,12 @@ public class BsCrudTableAction implements Serializable {
         }
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String index() {
         return displayList(false);
     }
 
-    @Execute(validator = false, input = "error.jsp", urlPattern = "list/{pageNumber}")
+    @Execute(validator = true, input = "error.jsp", urlPattern = "list/{pageNumber}")
     public String list() {
         // page navi
         if (StringUtil.isNotBlank(crudTableForm.pageNumber)) {
@@ -86,10 +93,10 @@ public class BsCrudTableAction implements Serializable {
         return displayList(false);
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String search() {
         Beans.copy(crudTableForm.searchParams, crudTablePager).excludes(
-                CommonConstants.PAGER_CONVERSION_RULE)
+                CommonConstants.PAGER_CONVERSION_RULE).excludesWhitespace()
     /* CRUD: BEGIN
             #if(${table.converterToPager})${table.converterToPager}#end##
        CRUD: END */
@@ -98,28 +105,28 @@ public class BsCrudTableAction implements Serializable {
         return displayList(false);
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String reset() {
         crudTablePager.clear();
 
         return displayList(false);
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String back() {
         return displayList(false);
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String editagain() {
         return "edit.jsp";
     }
 
     /* CRUD COMMENT: BEGIN */
-    @Execute(validator = false, input = "error.jsp", urlPattern = "confirmpage/{crudMode}/{id}")
+    @Execute(validator = true, input = "error.jsp", urlPattern = "confirmpage/{crudMode}/{id}")
     /* CRUD COMMENT: END */
     /* CRUD: BEGIN
-    @Execute(validator = false, input = "error.jsp", urlPattern = "confirmpage/{crudMode}/{${table.primaryKeyPath}}")
+    @Execute(validator = true, input = "error.jsp", urlPattern = "confirmpage/{crudMode}/{${table.primaryKeyPath}}")
        CRUD: END */
     public String confirmpage() {
         if (crudTableForm.crudMode != CommonConstants.CONFIRM_MODE) {
@@ -133,7 +140,7 @@ public class BsCrudTableAction implements Serializable {
         return "confirm.jsp";
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String createpage() {
         // page navi
         crudTableForm.initialize();
@@ -143,10 +150,10 @@ public class BsCrudTableAction implements Serializable {
     }
 
     /* CRUD COMMENT: BEGIN */
-    @Execute(validator = false, input = "error.jsp", urlPattern = "editpage/{crudMode}/{id}")
+    @Execute(validator = true, input = "error.jsp", urlPattern = "editpage/{crudMode}/{id}")
     /* CRUD COMMENT: END */
     /* CRUD: BEGIN
-    @Execute(validator = false, input = "error.jsp", urlPattern = "editpage/{crudMode}/{${table.primaryKeyPath}}")
+    @Execute(validator = true, input = "error.jsp", urlPattern = "editpage/{crudMode}/{${table.primaryKeyPath}}")
        CRUD: END */
     public String editpage() {
         if (crudTableForm.crudMode != CommonConstants.EDIT_MODE) {
@@ -160,7 +167,7 @@ public class BsCrudTableAction implements Serializable {
         return "edit.jsp";
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String editfromconfirm() {
         crudTableForm.crudMode = CommonConstants.EDIT_MODE;
 
@@ -180,10 +187,10 @@ public class BsCrudTableAction implements Serializable {
     }
 
     /* CRUD COMMENT: BEGIN */
-    @Execute(validator = false, input = "error.jsp", urlPattern = "deletepage/{crudMode}/{id}")
+    @Execute(validator = true, input = "error.jsp", urlPattern = "deletepage/{crudMode}/{id}")
     /* CRUD COMMENT: END */
     /* CRUD: BEGIN
-    @Execute(validator = false, input = "error.jsp", urlPattern = "deletepage/{crudMode}/{${table.primaryKeyPath}}")
+    @Execute(validator = true, input = "error.jsp", urlPattern = "deletepage/{crudMode}/{${table.primaryKeyPath}}")
        CRUD: END */
     public String deletepage() {
         if (crudTableForm.crudMode != CommonConstants.DELETE_MODE) {
@@ -197,7 +204,7 @@ public class BsCrudTableAction implements Serializable {
         return "confirm.jsp";
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String deletefromconfirm() {
         crudTableForm.crudMode = CommonConstants.DELETE_MODE;
 
@@ -248,7 +255,7 @@ public class BsCrudTableAction implements Serializable {
         }
     }
 
-    @Execute(validator = false, input = "error.jsp")
+    @Execute(validator = true, input = "error.jsp")
     public String delete() {
         if (crudTableForm.crudMode != CommonConstants.DELETE_MODE) {
             throw new ActionMessagesException("errors.crud_invalid_mode",

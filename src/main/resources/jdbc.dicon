@@ -5,20 +5,6 @@
 	<include path="jta.dicon"/>
 	<include path="jdbc-extension.dicon"/>
 
-	<component class="org.seasar.extension.jdbc.impl.BasicResultSetFactory"/>
-	<component class="org.seasar.extension.jdbc.impl.ConfigurableStatementFactory">
-		<arg>
-			<component class="org.seasar.extension.jdbc.impl.BasicStatementFactory"/>
-		</arg>
-		<property name="fetchSize">100</property>
-		<!--
-		<property name="maxRows">100</property>
-		-->
-	</component>
-	<!--
-	<component class="org.seasar.extension.jdbc.impl.OracleResultSetFactory"/>
-	<component class="org.seasar.extension.jdbc.impl.BooleanToIntStatementFactory"/>
-	-->
 	<!-- for Derby Embedded
 	<component name="xaDataSource"
 		class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
