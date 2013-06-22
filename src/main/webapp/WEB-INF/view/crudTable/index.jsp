@@ -58,7 +58,7 @@ body {
 <%-- CRUD COMMENT: END --%>
 <%-- CRUD: BEGIN
 #foreach( $table in ${database.getTableList()} )
-							<li><s:link href="${table.propertyName}/index">crudTable</s:link></li>
+							<li><s:link href="../${table.propertyName}/index">crudTable</s:link></li>
 #end
      CRUD: END --%>
 						</ul>

@@ -2,12 +2,12 @@
 
 TARGET_DIR=$1
 
-cd `basedir $0`
+cd `dirname $0`
 cd ../../..
 BASE_DIR=`pwd`
 
-for file in `ffg $BASE_DIR/src/main/java/org.codelibs/crud/ | grep -v /db/` ; do
-    newfile=`echo $file | sed -e "s/$BASE_DIR\/src\/main\/java\/jp\/sf\/pal\/crud\///" -e "s/\.java/\.vm/"`
+for file in `ffg $BASE_DIR/src/main/java/org/codelibs/crud/ | grep -v /db/` ; do
+    newfile=`echo $file | sed -e "s/.*\/src\/main\/java\/org\/codelibs\/crud\///" -e "s/\.java/\.vm/"`
     echo "Copying $newfile.."
     newfile="$TARGET_DIR/template/sastruts/java/$newfile"
     mkdir -p `dirname $newfile`
@@ -32,7 +32,7 @@ for file in `ffg $BASE_DIR/src/main/java/org.codelibs/crud/ | grep -v /db/` ; do
 done
 
 for file in `ffg ../crud/src/main/webapp/WEB-INF/view/` ; do
-    newfile=`echo $file | sed -e "s/BASE_DIR\/src\/main\/webapp\/WEB-INF\/view\///" -e "s/\.jsp/\.vm/"`
+    newfile=`echo $file | sed -e "s/.*\/src\/main\/webapp\/WEB-INF\/view\///" -e "s/\.jsp/\.vm/"`
     echo "Copying $newfile.."
     newfile="$TARGET_DIR/template/sastruts/webapp/WEB-INF/view/$newfile"
     mkdir -p `dirname $newfile`
@@ -51,7 +51,7 @@ for file in `ffg ../crud/src/main/webapp/WEB-INF/view/` ; do
 done
 
 for file in `ffg ../crud/src/main/resources application` ; do
-    newfile=`echo $file | sed -e "s/$BASE_DIR\/src\/main\/resources\///"`
+    newfile=`echo $file | sed -e "s/.*\/src\/main\/resources\///"`
     echo "Copying $newfile.."
     newfile="$TARGET_DIR/template/sastruts/resources/$newfile"
     mkdir -p `dirname $newfile`
@@ -60,3 +60,9 @@ for file in `ffg ../crud/src/main/resources application` ; do
     sed -e "1,/# CRUD PROPERTIES: BEGIN/d" -e "/# CRUD PROPERTIES: END/,\$d" $file >> $newfile
     echo "# CRUD PROPERTIES: END" >> $newfile
 done
+
+cd src/main/webapp
+TEMP_ZIP_FILE=/tmp/webresource.zip
+zip $TEMP_ZIP_FILE `find css img js -type f`
+mv $TEMP_ZIP_FILE $TARGET_DIR/template/sastruts
+

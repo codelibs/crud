@@ -110,7 +110,7 @@
           <rootPackage>org.codelibs.crud</rootPackage>
           <dbPackage>org.codelibs.crud.db</dbPackage>
           <clientProject>crud</clientProject>
-          <schemaFile>${basedir}/dbflute/schema/project-schema-crud.xml</schemaFile>
+          <schemaFile>${basedir}/dbflute_crud/schema/project-schema-crud.xml</schemaFile>
           <jspDir>${basedir}/src/main/webapp/WEB-INF/view</jspDir>
           <database>mysql</database>
           <databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
