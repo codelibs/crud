@@ -45,35 +45,9 @@ public class BsCrudTableAction implements Serializable {
     @Resource
     protected CrudTablePager crudTablePager;
 
-    protected String displayList(boolean redirect) {
-        // page navi
-        try {
-            crudTableItems = crudTableService.getCrudTableList(crudTablePager);
-        } catch (Exception e) {
-            crudTablePager.clear();
-            log.warn("Could not retrieve the data", e);
-            throw new ActionMessagesException(
-                    "errors.crud_failed_to_retrieve_crud_table");
-        }
-
-        // restore from pager
-        Beans.copy(crudTablePager, crudTableForm.searchParams)
-            .excludes(CommonConstants.PAGER_CONVERSION_RULE)
-    /* CRUD: BEGIN
-            #if(${table.converterToSearchParams})${table.converterToSearchParams}#end##
-       CRUD: END */
-            .execute();
-
-        if (redirect) {
-            return "index?redirect=true";
-        } else {
-            return "index.jsp";
-        }
-    }
-
     @Execute(validator = true, input = "error.jsp")
     public String index() {
-        return displayList(false);
+        return displayListPage(false);
     }
 
     @Execute(validator = true, input = "error.jsp", urlPattern = "list/{pageNumber}")
@@ -90,36 +64,37 @@ public class BsCrudTableAction implements Serializable {
             }
         }
 
-        return displayList(false);
+        return displayListPage(false);
     }
 
     @Execute(validator = true, input = "error.jsp")
     public String search() {
-        Beans.copy(crudTableForm.searchParams, crudTablePager).excludes(
-                CommonConstants.PAGER_CONVERSION_RULE).excludesWhitespace()
-    /* CRUD: BEGIN
-            #if(${table.converterToPager})${table.converterToPager}#end##
-       CRUD: END */
+        Beans.copy(crudTableForm.searchParams, crudTablePager)
+                .excludes(CommonConstants.PAGER_CONVERSION_RULE)
+                .excludesWhitespace()
+                /* CRUD: BEGIN
+                        #if(${table.converterToPager})${table.converterToPager}#end##
+                   CRUD: END */
                 .execute();
 
-        return displayList(false);
+        return displayListPage(false);
     }
 
     @Execute(validator = true, input = "error.jsp")
     public String reset() {
         crudTablePager.clear();
 
-        return displayList(false);
+        return displayListPage(false);
     }
 
     @Execute(validator = true, input = "error.jsp")
     public String back() {
-        return displayList(false);
+        return displayListPage(false);
     }
 
     @Execute(validator = true, input = "error.jsp")
     public String editagain() {
-        return "edit.jsp";
+        return displayEditPage();
     }
 
     /* CRUD COMMENT: BEGIN */
@@ -137,7 +112,7 @@ public class BsCrudTableAction implements Serializable {
 
         loadCrudTable();
 
-        return "confirm.jsp";
+        return displayConfirmPage();
     }
 
     @Execute(validator = true, input = "error.jsp")
@@ -146,7 +121,7 @@ public class BsCrudTableAction implements Serializable {
         crudTableForm.initialize();
         crudTableForm.crudMode = CommonConstants.CREATE_MODE;
 
-        return "edit.jsp";
+        return displayEditPage();
     }
 
     /* CRUD COMMENT: BEGIN */
@@ -164,7 +139,7 @@ public class BsCrudTableAction implements Serializable {
 
         loadCrudTable();
 
-        return "edit.jsp";
+        return displayEditPage();
     }
 
     @Execute(validator = true, input = "error.jsp")
@@ -173,17 +148,17 @@ public class BsCrudTableAction implements Serializable {
 
         loadCrudTable();
 
-        return "edit.jsp";
+        return displayEditPage();
     }
 
     @Execute(validator = true, input = "edit.jsp")
     public String confirmfromcreate() {
-        return "confirm.jsp";
+        return displayConfirmPage();
     }
 
     @Execute(validator = true, input = "edit.jsp")
     public String confirmfromupdate() {
-        return "confirm.jsp";
+        return displayConfirmPage();
     }
 
     /* CRUD COMMENT: BEGIN */
@@ -201,7 +176,7 @@ public class BsCrudTableAction implements Serializable {
 
         loadCrudTable();
 
-        return "confirm.jsp";
+        return displayConfirmPage();
     }
 
     @Execute(validator = true, input = "error.jsp")
@@ -210,7 +185,7 @@ public class BsCrudTableAction implements Serializable {
 
         loadCrudTable();
 
-        return "confirm.jsp";
+        return displayConfirmPage();
     }
 
     @Execute(validator = true, input = "edit.jsp")
@@ -220,7 +195,7 @@ public class BsCrudTableAction implements Serializable {
             crudTableService.store(crudTable);
             SAStrutsUtil.addSessionMessage("success.crud_create_crud_table");
 
-            return displayList(true);
+            return displayListPage(true);
         } catch (ActionMessagesException e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -241,7 +216,7 @@ public class BsCrudTableAction implements Serializable {
             crudTableService.store(crudTable);
             SAStrutsUtil.addSessionMessage("success.crud_update_crud_table");
 
-            return displayList(true);
+            return displayListPage(true);
         } catch (ActionMessagesException e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -269,28 +244,28 @@ public class BsCrudTableAction implements Serializable {
                 // throw an exception
                 throw new ActionMessagesException(
                         "errors.crud_could_not_find_crud_table",
-    /* CRUD COMMENT: BEGIN */
+                        /* CRUD COMMENT: BEGIN */
                         new Object[] { crudTableForm.id });
-    /* CRUD COMMENT: END */
-    /* CRUD: BEGIN
-                        new Object[] {##
-        #set( $separatorFlag = "false" )##
-        #foreach( $pKey in ${table.getPrimaryKeyList()} )##
-          #if(${separatorFlag} == "true")##
-                        + ", " +
-          #else##
-            #set( $separatorFlag = "true" )##
-          #end##
-                        crudTableForm.${pKey}
-        #end##
-                        });
-       CRUD: END */
+                /* CRUD COMMENT: END */
+                /* CRUD: BEGIN
+                                    new Object[] {##
+                    #set( $separatorFlag = "false" )##
+                    #foreach( $pKey in ${table.getPrimaryKeyList()} )##
+                      #if(${separatorFlag} == "true")##
+                                    + ", " +
+                      #else##
+                        #set( $separatorFlag = "true" )##
+                      #end##
+                                    crudTableForm.${pKey}
+                    #end##
+                                    });
+                   CRUD: END */
             }
 
             crudTableService.delete(crudTable);
             SAStrutsUtil.addSessionMessage("success.crud_delete_crud_table");
 
-            return displayList(true);
+            return displayListPage(true);
         } catch (ActionMessagesException e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -311,29 +286,33 @@ public class BsCrudTableAction implements Serializable {
             // throw an exception
             throw new ActionMessagesException(
                     "errors.crud_could_not_find_crud_table",
-    /* CRUD COMMENT: BEGIN */
+                    /* CRUD COMMENT: BEGIN */
                     new Object[] { crudTableForm.id });
-    /* CRUD COMMENT: END */
-    /* CRUD: BEGIN
-                    new Object[] {##
-        #set( $separatorFlag = "false" )##
-        #foreach( $pKey in ${table.getPrimaryKeyList()} )##
-          #if(${separatorFlag} == "true")##
-                        + ", " +
-          #else##
-            #set( $separatorFlag = "true" )##
-          #end##
-                        crudTableForm.${pKey}
-        #end##
-                        });
-       CRUD: END */
+            /* CRUD COMMENT: END */
+            /* CRUD: BEGIN
+                            new Object[] {##
+                #set( $separatorFlag = "false" )##
+                #foreach( $pKey in ${table.getPrimaryKeyList()} )##
+                  #if(${separatorFlag} == "true")##
+                                + ", " +
+                  #else##
+                    #set( $separatorFlag = "true" )##
+                  #end##
+                                crudTableForm.${pKey}
+                #end##
+                                });
+               CRUD: END */
         }
 
+        copyCrudTableToForm(crudTable);
+    }
+
+    protected void copyCrudTableToForm(CrudTable crudTable) {
         Beans.copy(crudTable, crudTableForm).excludes("searchParams", "mode")
-    /* CRUD: BEGIN
-            #if(${table.converterToActionForm})${table.converterToActionForm}#end##
-       CRUD: END */
-                .execute();
+        /* CRUD: BEGIN
+                #if(${table.converterToActionForm})${table.converterToActionForm}#end##
+           CRUD: END */
+        .execute();
     }
 
     protected CrudTable createCrudTable() {
@@ -344,37 +323,37 @@ public class BsCrudTableAction implements Serializable {
                 // throw an exception
                 throw new ActionMessagesException(
                         "errors.crud_could_not_find_crud_table",
-    /* CRUD COMMENT: BEGIN */
+                        /* CRUD COMMENT: BEGIN */
                         new Object[] { crudTableForm.id });
-    /* CRUD COMMENT: END */
-    /* CRUD: BEGIN
-                        new Object[] {##
-        #set( $separatorFlag = "false" )##
-        #foreach( $pKey in ${table.getPrimaryKeyList()} )##
-          #if(${separatorFlag} == "true")##
-                        + ", " +
-          #else##
-            #set( $separatorFlag = "true" )##
-          #end##
-                        crudTableForm.${pKey}
-        #end##
-                        });
-       CRUD: END */
+                /* CRUD COMMENT: END */
+                /* CRUD: BEGIN
+                                    new Object[] {##
+                    #set( $separatorFlag = "false" )##
+                    #foreach( $pKey in ${table.getPrimaryKeyList()} )##
+                      #if(${separatorFlag} == "true")##
+                                    + ", " +
+                      #else##
+                        #set( $separatorFlag = "true" )##
+                      #end##
+                                    crudTableForm.${pKey}
+                    #end##
+                                    });
+                   CRUD: END */
             }
         } else {
             crudTable = new CrudTable();
         }
-        updateCrudTable(crudTable);
+        copyCrudTableFromForm(crudTable);
 
         return crudTable;
     }
 
-    protected void updateCrudTable(CrudTable crudTable) {
+    protected void copyCrudTableFromForm(CrudTable crudTable) {
         Beans.copy(crudTableForm, crudTable).excludes("searchParams", "mode")
-    /* CRUD: BEGIN
-            #if(${table.converterToEntity})${table.converterToEntity}#end##
-       CRUD: END */
-                .execute();
+        /* CRUD: BEGIN
+                #if(${table.converterToEntity})${table.converterToEntity}#end##
+           CRUD: END */
+        .execute();
     }
 
     protected Map<String, String> createKeyMap() {
@@ -393,5 +372,39 @@ public class BsCrudTableAction implements Serializable {
            CRUD: END */
 
         return keys;
+    }
+
+    protected String displayListPage(boolean redirect) {
+        // page navi
+        try {
+            crudTableItems = crudTableService.getCrudTableList(crudTablePager);
+        } catch (Exception e) {
+            crudTablePager.clear();
+            log.warn("Could not retrieve the data", e);
+            throw new ActionMessagesException(
+                    "errors.crud_failed_to_retrieve_crud_table");
+        }
+
+        // restore from pager
+        Beans.copy(crudTablePager, crudTableForm.searchParams)
+                .excludes(CommonConstants.PAGER_CONVERSION_RULE)
+                /* CRUD: BEGIN
+                #if(${table.converterToSearchParams})${table.converterToSearchParams}#end##
+                   CRUD: END */
+                .execute();
+
+        if (redirect) {
+            return "index?redirect=true";
+        } else {
+            return "index.jsp";
+        }
+    }
+
+    protected String displayConfirmPage() {
+        return "confirm.jsp";
+    }
+
+    protected String displayEditPage() {
+        return "edit.jsp";
     }
 }

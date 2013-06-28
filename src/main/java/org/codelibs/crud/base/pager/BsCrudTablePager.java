@@ -28,7 +28,8 @@ public abstract class BsCrudTablePager implements Serializable {
 
     /* CRUD COMMENT: BEGIN */
     public String id;
-
+    
+    public String value;
     /* CRUD COMMENT: END */
 
     /* CRUD: BEGIN

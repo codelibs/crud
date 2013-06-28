@@ -100,14 +100,12 @@ body {
 <%-- CRUD COMMENT: END --%>
 <%-- CRUD: BEGIN
 #foreach( $column in ${table.getColumnList()} )
-	#if(${column.primaryKey})
 										<div class="control-group">
 											<label class="control-label" for="${column.name}Input">${column.name}</label>
 											<div class="controls">
 												<html:text property="searchParams.${column.name}" styleId="${column.name}Input"></html:text>
 											</div>
 										</div>
-	#end
 #end
      CRUD: END --%>
 										<div class="control-group">

@@ -123,7 +123,8 @@ public abstract class BsCrudTableService {
         #end
         #end
         // TODO Long, Integer, String supported only.
-           CRUD: END */}
+           CRUD: END */
+        }
 
     protected void setupEntityCondition(CrudTableCB cb, Map<String, String> keys) {
     }
