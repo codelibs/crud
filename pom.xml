@@ -106,7 +106,7 @@
         <artifactId>dbflute-maven-plugin</artifactId>
         <version>1.0.2-SNAPSHOT</version>
         <configuration>
-          <dbfluteVersion>1.0.4C</dbfluteVersion>
+          <dbfluteVersion>1.0.5A</dbfluteVersion>
           <rootPackage>org.codelibs.crud</rootPackage>
           <dbPackage>org.codelibs.crud.db</dbPackage>
           <clientProject>crud</clientProject>
@@ -204,7 +204,7 @@
     <dependency>
       <groupId>org.seasar.dbflute</groupId>
       <artifactId>dbflute-runtime</artifactId>
-      <version>1.0.4C</version>
+      <version>1.0.5A</version>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>

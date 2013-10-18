@@ -64,5 +64,6 @@ done
 cd src/main/webapp
 TEMP_ZIP_FILE=/tmp/webresource.zip
 zip $TEMP_ZIP_FILE `find css img js -type f`
+cd ../../..
 mv $TEMP_ZIP_FILE $TARGET_DIR/template/sastruts
 

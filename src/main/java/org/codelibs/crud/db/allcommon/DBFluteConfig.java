@@ -44,12 +44,6 @@ public class DBFluteConfig {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DBFluteConfig.class);
 
-    /** The default package of outside SQL. */
-    private static final String DEFAULT_OUTSIDE_SQL_PACKAGE = null;
-
-    /** The default value of whether it uses SQL Log Registry. The default value is false. */
-    private static final boolean DEFAULT_USE_SQL_LOG_REGISTRY = false;
-
     /** Singleton instance. */
     private static final DBFluteConfig _instance = new DBFluteConfig();
 
@@ -67,6 +61,7 @@ public class DBFluteConfig {
     protected boolean _emptyStringParameterAllowed;
     protected boolean _invalidQueryChecked;
     protected boolean _disableSelectIndex;
+    protected boolean _checkCountBeforeQueryUpdate = false;
 
     // logging
     protected boolean _queryLogLevelInfo;
@@ -80,8 +75,8 @@ public class DBFluteConfig {
     protected DataSourceHandler _dataSourceHandler;
     protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SQLExceptionDigger _sqlExceptionDigger;
-    protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
-    protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
+    protected String _outsideSqlPackage;
+    protected boolean _useSqlLogRegistry = false;
 
     // extension
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
@@ -241,6 +236,21 @@ public class DBFluteConfig {
             _log.info("...Setting disableSelectIndex: " + disableSelectIndex);
         }
         _disableSelectIndex = disableSelectIndex;
+    }
+
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    public boolean isCheckCountBeforeQueryUpdate() {
+        return _checkCountBeforeQueryUpdate;
+    }
+
+    public void setCheckCountBeforeQueryUpdate(boolean checkCountBeforeQueryUpdate) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting checkCountBeforeQueryUpdate: " + checkCountBeforeQueryUpdate);
+        }
+        _checkCountBeforeQueryUpdate = checkCountBeforeQueryUpdate;
     }
 
     // ===================================================================================

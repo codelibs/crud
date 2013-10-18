@@ -28,22 +28,18 @@ public class CrudTableService extends BsCrudTableService implements
 
         /* CRUD: BEGIN
         #foreach( $column in ${table.getColumnList()} )
-        #if(!${column.primaryKey})
         #if(${column.javaType} == "Long")
         if (crudTablePager.${column.propertyName} != null) {
             cb.query().set${column.methodName}_Equal(Long.parseLong(crudTablePager.${column.propertyName}));
         }
-        #end
-        #if(${column.javaType} == "Integer")
+        #elseif(${column.javaType} == "Integer")
         if (crudTablePager.${column.propertyName} != null) {
             cb.query().set${column.methodName}_Equal(Integer.parseInt(crudTablePager.${column.propertyName}));
         }
-        #end
-        #if(${column.javaType} == "String")
+        #elseif(${column.javaType} == "String")
         if (crudTablePager.${column.propertyName} != null) {
             cb.query().set${column.methodName}_Equal(crudTablePager.${column.propertyName});
         }
-        #end
         #end
         #end
         // TODO Long, Integer, String supported only.

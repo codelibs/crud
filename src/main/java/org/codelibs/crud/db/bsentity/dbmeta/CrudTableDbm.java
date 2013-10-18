@@ -133,7 +133,6 @@ public class CrudTableDbm extends AbstractDBMeta {
     //                                                                           =========
     public String getEntityTypeName() { return "org.codelibs.crud.db.exentity.CrudTable"; }
     public String getConditionBeanTypeName() { return "org.codelibs.crud.db.cbean.CrudTableCB"; }
-    public String getDaoTypeName() { return "${glPackageExtendedDao}.CrudTableDao"; }
     public String getBehaviorTypeName() { return "org.codelibs.crud.db.exbhv.CrudTableBhv"; }
 
     // ===================================================================================

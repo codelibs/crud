@@ -223,13 +223,17 @@ public class BsCrudTableCQ extends AbstractBsCrudTableCQ {
     // ===================================================================================
     //                                                                       Foreign Query
     //                                                                       =============
+    protected Map<String, Object> xfindFixedConditionDynamicParameterMap(String property) {
+        return null;
+    }
+
     // ===================================================================================
     //                                                                     ScalarCondition
     //                                                                     ===============
     protected Map<String, CrudTableCQ> _scalarConditionMap;
     public Map<String, CrudTableCQ> getScalarCondition() { return _scalarConditionMap; }
     public String keepScalarCondition(CrudTableCQ subQuery) {
-        if (_scalarConditionMap == null) { _scalarConditionMap = newLinkedHashMap(); }
+        if (_scalarConditionMap == null) { _scalarConditionMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_scalarConditionMap.size() + 1);
         _scalarConditionMap.put(key, subQuery); return "scalarCondition." + key;
     }
@@ -240,7 +244,7 @@ public class BsCrudTableCQ extends AbstractBsCrudTableCQ {
     protected Map<String, CrudTableCQ> _specifyMyselfDerivedMap;
     public Map<String, CrudTableCQ> getSpecifyMyselfDerived() { return _specifyMyselfDerivedMap; }
     public String keepSpecifyMyselfDerived(CrudTableCQ subQuery) {
-        if (_specifyMyselfDerivedMap == null) { _specifyMyselfDerivedMap = newLinkedHashMap(); }
+        if (_specifyMyselfDerivedMap == null) { _specifyMyselfDerivedMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_specifyMyselfDerivedMap.size() + 1);
         _specifyMyselfDerivedMap.put(key, subQuery); return "specifyMyselfDerived." + key;
     }
@@ -248,14 +252,14 @@ public class BsCrudTableCQ extends AbstractBsCrudTableCQ {
     protected Map<String, CrudTableCQ> _queryMyselfDerivedMap;
     public Map<String, CrudTableCQ> getQueryMyselfDerived() { return _queryMyselfDerivedMap; }
     public String keepQueryMyselfDerived(CrudTableCQ subQuery) {
-        if (_queryMyselfDerivedMap == null) { _queryMyselfDerivedMap = newLinkedHashMap(); }
+        if (_queryMyselfDerivedMap == null) { _queryMyselfDerivedMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_queryMyselfDerivedMap.size() + 1);
         _queryMyselfDerivedMap.put(key, subQuery); return "queryMyselfDerived." + key;
     }
     protected Map<String, Object> _qyeryMyselfDerivedParameterMap;
     public Map<String, Object> getQueryMyselfDerivedParameter() { return _qyeryMyselfDerivedParameterMap; }
     public String keepQueryMyselfDerivedParameter(Object parameterValue) {
-        if (_qyeryMyselfDerivedParameterMap == null) { _qyeryMyselfDerivedParameterMap = newLinkedHashMap(); }
+        if (_qyeryMyselfDerivedParameterMap == null) { _qyeryMyselfDerivedParameterMap = newLinkedHashMapSized(4); }
         String key = "subQueryParameterKey" + (_qyeryMyselfDerivedParameterMap.size() + 1);
         _qyeryMyselfDerivedParameterMap.put(key, parameterValue); return "queryMyselfDerivedParameter." + key;
     }
@@ -266,7 +270,7 @@ public class BsCrudTableCQ extends AbstractBsCrudTableCQ {
     protected Map<String, CrudTableCQ> _myselfExistsMap;
     public Map<String, CrudTableCQ> getMyselfExists() { return _myselfExistsMap; }
     public String keepMyselfExists(CrudTableCQ subQuery) {
-        if (_myselfExistsMap == null) { _myselfExistsMap = newLinkedHashMap(); }
+        if (_myselfExistsMap == null) { _myselfExistsMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_myselfExistsMap.size() + 1);
         _myselfExistsMap.put(key, subQuery); return "myselfExists." + key;
     }
@@ -277,7 +281,7 @@ public class BsCrudTableCQ extends AbstractBsCrudTableCQ {
     protected Map<String, CrudTableCQ> _myselfInScopeMap;
     public Map<String, CrudTableCQ> getMyselfInScope() { return _myselfInScopeMap; }
     public String keepMyselfInScope(CrudTableCQ subQuery) {
-        if (_myselfInScopeMap == null) { _myselfInScopeMap = newLinkedHashMap(); }
+        if (_myselfInScopeMap == null) { _myselfInScopeMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_myselfInScopeMap.size() + 1);
         _myselfInScopeMap.put(key, subQuery); return "myselfInScope." + key;
     }

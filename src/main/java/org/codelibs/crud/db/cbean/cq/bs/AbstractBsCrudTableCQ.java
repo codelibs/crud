@@ -627,7 +627,7 @@ public abstract class AbstractBsCrudTableCQ extends AbstractConditionQuery {
      * @param toDate The to-date(yyyy/MM/dd) of createdTime. (NullAllowed: if null, no to-condition)
      */
     public void setCreatedTime_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        setCreatedTime_FromTo(fromDate, toDate, new DateFromToOption());
+        setCreatedTime_FromTo(fromDate, toDate, new FromToOption().compareAsDate());
     }
 
     protected void regCreatedTime(ConditionKey k, Object v) { regQ(k, v, getCValueCreatedTime(), "created_time"); }

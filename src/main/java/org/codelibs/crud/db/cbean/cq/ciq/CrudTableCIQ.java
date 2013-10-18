@@ -1,5 +1,6 @@
 package org.codelibs.crud.db.cbean.cq.ciq;
 
+import java.util.Map;
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.cbean.ckey.*;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -73,6 +74,7 @@ public class CrudTableCIQ extends AbstractBsCrudTableCQ {
     protected ConditionValue getCValueValue() { return _myCQ.getValue(); }
     protected ConditionValue getCValueSortOrder() { return _myCQ.getSortOrder(); }
     protected ConditionValue getCValueCreatedTime() { return _myCQ.getCreatedTime(); }
+    protected Map<String, Object> xfindFixedConditionDynamicParameterMap(String property) { return null; }
     public String keepScalarCondition(CrudTableCQ subQuery)
     { throwIICBOE("ScalarCondition"); return null; }
     public String keepSpecifyMyselfDerived(CrudTableCQ subQuery)

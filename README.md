@@ -6,5 +6,5 @@ This project is CRUD Web Application to generate template files for DBFlute Mave
 
 ## Generate template files
 
-    bash src/main/script/generate.sh [dbflute-maven-plugin path]
+    bash src/main/script/generate.sh [dbflute-maven-plugin]/src/main/resources/default
 

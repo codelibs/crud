@@ -91,6 +91,9 @@ public abstract class BsCrudTable implements Entity, Serializable, Cloneable {
     /** The modified properties for this entity. (NotNull) */
     protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
 
+    /** Is the entity created by DBFlute select process? */
+    protected boolean __createdBySelect;
+
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
@@ -165,6 +168,23 @@ public abstract class BsCrudTable implements Entity, Serializable, Cloneable {
 
     protected EntityModifiedProperties newModifiedProperties() {
         return new EntityModifiedProperties();
+    }
+
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
+    /**
+     * {@inheritDoc}
+     */
+    public void markAsSelect() {
+        __createdBySelect = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean createdBySelect() {
+        return __createdBySelect;
     }
 
     // ===================================================================================

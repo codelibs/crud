@@ -42,6 +42,9 @@ public class BsCrudTableCB extends AbstractConditionBean {
         if (DBFluteConfig.getInstance().isPagingCountLeastJoin()) {
             enablePagingCountLeastJoin();
         }
+        if (DBFluteConfig.getInstance().isCheckCountBeforeQueryUpdate()) {
+            enableCheckCountBeforeQueryUpdate();
+        }
     }
 
     // ===================================================================================
@@ -275,12 +278,12 @@ public class BsCrudTableCB extends AbstractConditionBean {
         return _specification;
     }
 
-    protected boolean hasSpecifiedColumn() {
-        return _specification != null && _specification.isAlreadySpecifiedRequiredColumn();
+    public HpColumnSpHandler localSp() {
+        return specify();
     }
 
-    protected HpAbstractSpecification<? extends ConditionQuery> localSp() {
-        return specify();
+    public boolean hasSpecifiedColumn() {
+        return _specification != null && _specification.isAlreadySpecifiedRequiredColumn();
     }
 
     public static class HpSpecification extends HpAbstractSpecification<CrudTableCQ> {
@@ -312,10 +315,7 @@ public class BsCrudTableCB extends AbstractConditionBean {
          * @return The information object of specified column. (NotNull)
          */
         public HpSpecifiedColumn columnCreatedTime() { return doColumn("created_time"); }
-        /**
-         * Specify columns except record meta columns. <br />
-         * You cannot use normal SpecifyColumn with this method.
-         */
+        public void everyColumn() { doEveryColumn(); }
         public void exceptRecordMetaColumn() { doExceptRecordMetaColumn(); }
         @Override
         protected void doSpecifyRequiredColumn() {
@@ -328,7 +328,7 @@ public class BsCrudTableCB extends AbstractConditionBean {
          * @return The object to set up a function for myself table. (NotNull)
          */
         public HpSDRFunction<CrudTableCB, CrudTableCQ> myselfDerived() {
-            assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
             return new HpSDRFunction<CrudTableCB, CrudTableCQ>(_baseCB, _qyCall.qy(), new HpSDRSetupper<CrudTableCB, CrudTableCQ>() {
                 public void setup(String function, SubQuery<CrudTableCB> subQuery, CrudTableCQ cq, String aliasName, DerivedReferrerOption option) {
                     cq.xsmyselfDerive(function, subQuery, aliasName, option); } }, _dbmetaProvider);

@@ -34,7 +34,11 @@ public abstract class BsCrudTablePager implements Serializable {
 
     /* CRUD: BEGIN
     #foreach( $column in ${table.getColumnList()} )
-    #if(${column.required})
+    #if(${column.javaType} == "Long")
+    public String ${column.propertyName};
+    #elseif(${column.javaType} == "Integer")
+    public String ${column.propertyName};
+    #elseif(${column.javaType} == "String")
     public String ${column.propertyName};
     #end
     #end
@@ -50,7 +54,11 @@ public abstract class BsCrudTablePager implements Serializable {
 
         /* CRUD: BEGIN
         #foreach( $column in ${table.getColumnList()} )
-        #if(${column.required})
+        #if(${column.javaType} == "Long")
+        ${column.propertyName} = null;
+        #elseif(${column.javaType} == "Integer")
+        ${column.propertyName} = null;
+        #elseif(${column.javaType} == "String")
         ${column.propertyName} = null;
         #end
         #end
@@ -64,7 +72,11 @@ public abstract class BsCrudTablePager implements Serializable {
 
         /* CRUD: BEGIN
         #foreach( $column in ${table.getColumnList()} )
-        #if(${column.required})
+        #if(${column.javaType} == "Long")
+        if(StringUtil.isNotBlank(${column.propertyName})){return true;}
+        #elseif(${column.javaType} == "Integer")
+        if(StringUtil.isNotBlank(${column.propertyName})){return true;}
+        #elseif(${column.javaType} == "String")
         if(StringUtil.isNotBlank(${column.propertyName})){return true;}
         #end
         #end

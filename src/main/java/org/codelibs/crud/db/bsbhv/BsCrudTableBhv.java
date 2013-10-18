@@ -382,7 +382,7 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
     //                                                                       Entity Update
     //                                                                       =============
     /**
-     * Insert the entity. (DefaultConstraintsEnabled)
+     * Insert the entity modified-only. (DefaultConstraintsEnabled)
      * <pre>
      * CrudTable crudTable = new CrudTable();
      * <span style="color: #3F7E5E">// if auto-increment, you don't need to set the PK value</span>
@@ -394,6 +394,7 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
      * crudTableBhv.<span style="color: #FD4747">insert</span>(crudTable);
      * ... = crudTable.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
      * </pre>
+     * <p>While, when the entity is created by select, all columns are registered.</p>
      * @param crudTable The entity of insert target. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
@@ -410,6 +411,9 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
     protected void prepareInsertOption(InsertOption<CrudTableCB> option) {
         if (option == null) { return; }
         assertInsertOptionStatus(option);
+        if (option.hasSpecifiedInsertColumn()) {
+            option.resolveInsertColumnSpecification(createCBForSpecifiedUpdate());
+        }
     }
 
     @Override
@@ -486,7 +490,9 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
     }
 
     /**
-     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, NonExclusiveControl)
+     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, NonExclusiveControl) <br />
+     * if (the entity has no PK) { insert() } else { update(), but no data, insert() } <br />
+     * <p><span style="color: #FD4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
      * @param crudTable The entity of insert or update target. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
@@ -570,22 +576,44 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
     //                                                                        Batch Update
     //                                                                        ============
     /**
-     * Batch-insert the entity list. (DefaultConstraintsDisabled) <br />
+     * Batch-insert the entity list modified-only of same-set columns. (DefaultConstraintsEnabled) <br />
      * This method uses executeBatch() of java.sql.PreparedStatement. <br />
-     * <span style="color: #FD4747">All columns are insert target. (so default constraints are not available in this method)</span> <br />
-     * And if the table has an identity, entities after the process don't have incremented values.
-     * When you use the (normal) insert(), an entity after the process has an incremented value.
+     * <p><span style="color: #FD4747; font-size: 120%">The columns of least common multiple are registered like this:</span></p>
+     * <pre>
+     * for (... : ...) {
+     *     CrudTable crudTable = new CrudTable();
+     *     crudTable.setFooName("foo");
+     *     if (...) {
+     *         crudTable.setFooPrice(123);
+     *     }
+     *     <span style="color: #3F7E5E">// FOO_NAME and FOO_PRICE (and record meta columns) are registered</span>
+     *     <span style="color: #3F7E5E">// FOO_PRICE not-called in any entities are registered as null without default value</span>
+     *     <span style="color: #3F7E5E">// columns not-called in all entities are registered as null or default value</span>
+     *     crudTableList.add(crudTable);
+     * }
+     * crudTableBhv.<span style="color: #FD4747">batchInsert</span>(crudTableList);
+     * </pre>
+     * <p>While, when the entities are created by select, all columns are registered.</p>
+     * <p>And if the table has an identity, entities after the process don't have incremented values.
+     * (When you use the (normal) insert(), you can get the incremented value from your entity)</p>
      * @param crudTableList The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNullAllowed: when auto-increment)
      * @return The array of inserted count. (NotNull, EmptyAllowed)
      */
     public int[] batchInsert(List<CrudTable> crudTableList) {
-        return doBatchInsert(crudTableList, null);
+        InsertOption<CrudTableCB> option = createInsertUpdateOption();
+        return doBatchInsert(crudTableList, option);
     }
 
     protected int[] doBatchInsert(List<CrudTable> crudTableList, InsertOption<CrudTableCB> option) {
         assertObjectNotNull("crudTableList", crudTableList);
-        prepareInsertOption(option);
+        prepareBatchInsertOption(crudTableList, option);
         return delegateBatchInsert(crudTableList, option);
+    }
+
+    protected void prepareBatchInsertOption(List<CrudTable> crudTableList, InsertOption<CrudTableCB> option) {
+        option.xallowInsertColumnModifiedPropertiesFragmented();
+        option.xacceptInsertColumnModifiedPropertiesIfNeeds(crudTableList);
+        prepareInsertOption(option);
     }
 
     @Override
@@ -595,30 +623,43 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
     }
 
     /**
-     * Batch-update the entity list. (AllColumnsUpdated, NonExclusiveControl) <br />
+     * Batch-update the entity list modified-only of same-set columns. (NonExclusiveControl) <br />
      * This method uses executeBatch() of java.sql.PreparedStatement. <br />
-     * <span style="color: #FD4747">All columns are update target. {NOT modified only}</span>
-     * So you should the other batchUpdate() method, which you can specify update columns like this:
+     * <span style="color: #FD4747; font-size: 120%">You should specify same-set columns to all entities like this:</span>
      * <pre>
-     * crudTableBhv.<span style="color: #FD4747">batchUpdate</span>(crudTableList, new SpecifyQuery<CrudTableCB>() {
-     *     public void specify(CrudTableCB cb) { <span style="color: #3F7E5E">// FOO_STATUS_CODE, BAR_DATE only updated</span>
-     *         cb.specify().columnFooStatusCode();
-     *         cb.specify().columnBarDate();
+     * for (... : ...) {
+     *     CrudTable crudTable = new CrudTable();
+     *     crudTable.setFooName("foo");
+     *     if (...) {
+     *         crudTable.setFooPrice(123);
+     *     } else {
+     *         crudTable.setFooPrice(null); <span style="color: #3F7E5E">// updated as null</span>
+     *         <span style="color: #3F7E5E">//crudTable.setFooDate(...); // *not allowed, fragmented</span>
      *     }
-     * });
+     *     <span style="color: #3F7E5E">// FOO_NAME and FOO_PRICE (and record meta columns) are updated</span>
+     *     <span style="color: #3F7E5E">// (others are not updated: their values are kept)</span>
+     *     crudTableList.add(crudTable);
+     * }
+     * crudTableBhv.<span style="color: #FD4747">batchUpdate</span>(crudTableList);
      * </pre>
      * @param crudTableList The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     public int[] batchUpdate(List<CrudTable> crudTableList) {
-        return doBatchUpdate(crudTableList, null);
+        UpdateOption<CrudTableCB> option = createPlainUpdateOption();
+        return doBatchUpdate(crudTableList, option);
     }
 
     protected int[] doBatchUpdate(List<CrudTable> crudTableList, UpdateOption<CrudTableCB> option) {
         assertObjectNotNull("crudTableList", crudTableList);
-        prepareUpdateOption(option);
+        prepareBatchUpdateOption(crudTableList, option);
         return delegateBatchUpdate(crudTableList, option);
+    }
+
+    protected void prepareBatchUpdateOption(List<CrudTable> crudTableList, UpdateOption<CrudTableCB> option) {
+        option.xacceptUpdateColumnModifiedPropertiesIfNeeds(crudTableList);
+        prepareUpdateOption(option);
     }
 
     @Override
@@ -628,19 +669,28 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
     }
 
     /**
-     * Batch-update the entity list. (SpecifiedColumnsUpdated, NonExclusiveControl) <br />
-     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
-     * You can specify update columns used on set clause of update statement.
-     * However you do not need to specify common columns for update
-     * and an optimistick lock column because they are specified implicitly.
+     * Batch-update the entity list specified-only. (NonExclusiveControl) <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement.
      * <pre>
+     * <span style="color: #3F7E5E">// e.g. update two columns only</span> 
      * crudTableBhv.<span style="color: #FD4747">batchUpdate</span>(crudTableList, new SpecifyQuery<CrudTableCB>() {
-     *     public void specify(CrudTableCB cb) { <span style="color: #3F7E5E">// FOO_STATUS_CODE, BAR_DATE only updated</span>
-     *         cb.specify().columnFooStatusCode();
-     *         cb.specify().columnBarDate();
+     *     public void specify(CrudTableCB cb) { <span style="color: #3F7E5E">// the two only updated</span>
+     *         cb.specify().<span style="color: #FD4747">columnFooStatusCode()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
+     *         cb.specify().<span style="color: #FD4747">columnBarDate()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
+     *     }
+     * });
+     * <span style="color: #3F7E5E">// e.g. update every column in the table</span> 
+     * crudTableBhv.<span style="color: #FD4747">batchUpdate</span>(crudTableList, new SpecifyQuery<CrudTableCB>() {
+     *     public void specify(CrudTableCB cb) { <span style="color: #3F7E5E">// all columns are updated</span>
+     *         cb.specify().<span style="color: #FD4747">columnEveryColumn()</span>; <span style="color: #3F7E5E">// no check of modified properties</span>
      *     }
      * });
      * </pre>
+     * <p>You can specify update columns used on set clause of update statement.
+     * However you do not need to specify common columns for update
+     * and an optimistic lock column because they are specified implicitly.</p>
+     * <p>And you should specify columns that are modified in any entities (at least one entity).
+     * But if you specify every column, it has no check.</p>
      * @param crudTableList The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param updateColumnSpec The specification of update columns. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
@@ -766,7 +816,7 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
     protected int doQueryUpdate(CrudTable crudTable, CrudTableCB cb, UpdateOption<CrudTableCB> option) {
         assertObjectNotNull("crudTable", crudTable); assertCBStateValid(cb);
         prepareUpdateOption(option);
-        return delegateQueryUpdate(crudTable, cb, option);
+        return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryUpdate(crudTable, cb, option) : 0;
     }
 
     @Override
@@ -793,7 +843,7 @@ public abstract class BsCrudTableBhv extends AbstractBehaviorWritable {
     protected int doQueryDelete(CrudTableCB cb, DeleteOption<CrudTableCB> option) {
         assertCBStateValid(cb);
         prepareDeleteOption(option);
-        return delegateQueryDelete(cb, option);
+        return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryDelete(cb, option) : 0;
     }
 
     @Override
